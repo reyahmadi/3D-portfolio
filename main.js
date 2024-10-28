@@ -45,7 +45,7 @@ const group = new THREE.Group();
 // const axesHelper = new THREE.AxesHelper( 5 );
 
 
-const ledTextureNormal = new THREE.TextureLoader().load('assets/led.jpg')
+const ledTextureNormal = new THREE.TextureLoader().load('./assets/led.jpg')
 const ledTextureReflect = new THREE.TextureLoader().load('./assets/reflection_lcd.jpg')
 const glowMaterial = new THREE.MeshStandardMaterial({
     map: ledTextureReflect,
@@ -80,8 +80,8 @@ deskLight.position.set(3.9,0,2)
 // Loading slides
 let slides = [];
 for(let i = 1; i <= SLIDE_NUMBER; i++){
-    console.log('assets/slides/slide' + (i) + '.jpg')
-    const newTexture = new THREE.TextureLoader().load('assets/slides/slide' + i + '.jpg', function(loaded){
+    console.log('./assets/slides/slide' + (i) + '.jpg')
+    const newTexture = new THREE.TextureLoader().load('./assets/slides/slide' + i + '.jpg', function(loaded){
         loaded.flipY=false
         loaded.rotation = -Math.PI/2;
         loaded.center.set(0.5, 0.5);
@@ -152,7 +152,7 @@ loader.load(
         // Load font adn text
         const fontLoader = new FontLoader();
 
-        fontLoader.load( 'assets/fonts/Bad_Script_Regular.json', function ( font ) {
+        fontLoader.load( './assets/fonts/Bad_Script_Regular.json', function ( font ) {
             console.log(font)
             const textGeometry = new TextGeometry( 
                 `
