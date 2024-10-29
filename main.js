@@ -15,7 +15,7 @@ import gsap from 'gsap';
 
 const COUNTER_ROTATE = 120;
 const SLIDE_NUMBER = 6;
-
+const isMobileDevice = /Mobi|Android/i.test(navigator.userAgent);
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
@@ -125,7 +125,6 @@ loader.load(
 
 
         monitor = pc.getObjectByName('LED'); 
-        console.log(slides[0])
         monitor.material = slides[0];
         monitor.position.x += 0.08;       
 
@@ -147,59 +146,12 @@ loader.load(
         pc.rotation.set(0, Math.PI*5/4, 0);
 
         scene.add(group)
-        directLight.target = group;
-
-        // Load font adn text
-        const fontLoader = new FontLoader();
-
-        fontLoader.load( './assets/fonts/Bad_Script_Regular.json', function ( font ) {
-            console.log(font)
-            const textGeometry = new TextGeometry( 
-                `
-Get in touch with me :)
-`, {
-                    font: font,
-                    size: 0.1,
-                    depth: 0.008,
-                }
-            )
-
-            const paper = pc.getObjectByName("A4_Lined_Paper_OBJ")
-            const paperText = new THREE.Mesh( textGeometry, textMaterialPaper );
-            const textGroup = new THREE.Group();
-            paperText.position.set(paper.position.x + 3.5,paper.position.y, paper.position.z + 4.5);
-            paperText.rotation.set(Math.PI/2, Math.PI, Math.PI/2.04)
-            // group.add(paperText)
-        })         
+        directLight.target = group;      
 
 
 
     }
 );
-
-
-
-const planeGeometry = new THREE.PlaneGeometry(5, 5);
-
-// Create a material with transparency enabled and opacity set to 50%
-const planeMaterial = new THREE.MeshStandardMaterial({
-    // color: 0xe9e9e9,  // Green color
-    // transparent: true, // Enable transparency
-    // opacity: 0.5,      // Set opacity (0.5 means 50% transparent)
-    side: THREE.DoubleSide, // Optional: make the plane visible from both sides
-    blending: THREE.AdditiveBlending,
-});
-
-// Create the plane mesh
-const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.rotation.set(Math.PI/2, 0, 0)
-plane.position.set(10, -4, -10)
-plane.scale.set(10, 10, 10)
-plane.receiveShadow = true;
-plane.castShadow = true;
-// scene.add(plane)
-
-
 
 
 // Post-processing setup
@@ -242,7 +194,30 @@ let counterRotatePC = 0, counterRotatePaper = 0;
 const backButton = document.getElementsByClassName("back-button")[0];
 const guide = document.getElementById("guide");
 
+if(isMobileDevice){
+    guide.style.opacity = 0;
+}
+
+const navbarItems = document.querySelectorAll(".nav-item");
+
+navbarItems.forEach((item) => {
+  item.addEventListener("click", (event) => {
+    let item = event.target.getAttribute("data-item");
+    if(item == "aboutme"){
+        monitorClick();
+    }
+    else if(item == "contact"){
+        paperClick();
+    }
+    else if(item == "cv"){
+
+    }
+  });
+});
+
+
 function monitorClick(){
+    focus = "monitor"
     backButton.style.opacity = 100;
     guide.style.opacity = 0;
     counterRotatePC = COUNTER_ROTATE;
@@ -255,6 +230,7 @@ function monitorClick(){
 
 function paperClick(){
     if(focus!=="paper"){
+        focus = "paper";
         deskLight.intensity = 8; // Turn on the desk light
         counterRotatePaper = COUNTER_ROTATE;
         zoomIn = 1; // zoom in on the object
@@ -265,21 +241,22 @@ function paperClick(){
 
 }
 
-window.addEventListener('pointermove', (e) => {
-    mouse.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1)
-    raycaster.setFromCamera(mouse, camera)
-    intersects = raycaster.intersectObjects(scene.children, true)
-  
-  })
+function addMultipleEventListener(element, events, handler) {
+    events.forEach(e => element.addEventListener(e, handler))
+}
   
 // Event listener for clicking on obhjects
-window.addEventListener('click', (e) => {
+const handleClick = (e) => {
+    e.preventDefault();
+    const point = isMobileDevice ? e.touches[0] : e;
+    mouse.set((point.clientX / window.innerWidth) * 2 - 1, -(point.clientY / window.innerHeight) * 2 + 1)
+    raycaster.setFromCamera(mouse, camera)
+    intersects = raycaster.intersectObjects(scene.children, true)
     intersects.forEach((hit) => {
       // if the monitor is clicked and this is the first time
 
       if (hit.object.name === "LED" && focus!="monitor") {
         monitorClick();
-        focus = "monitor"
       }
     //if the monitor is clicked and monitor is already focused on
       else if (hit.object.name === "LED" && focus=="monitor"){
@@ -291,7 +268,6 @@ window.addEventListener('click', (e) => {
       }
       else if (hit.object.name == "A4_Lined_Paper_OBJ" && focus!="paper"){
         paperClick();
-        focus = "paper";
       }
       else if (hit.object.name == "linkedin"){
         window.open("https://www.linkedin.com/in/reyhaneh-ahamdi-nokabadi-b9a992183/", "_blank")
@@ -303,7 +279,7 @@ window.addEventListener('click', (e) => {
         window.open("https://www.github.com/reyahmadi", "_blank")
       }
     })
-  })
+  }
 
   backButton.addEventListener('click', (e) => {
       zoomIn = -1;
@@ -317,6 +293,8 @@ window.addEventListener('click', (e) => {
       guide.style.opacity = 100;
   })
 
+
+addMultipleEventListener(window, ['click', 'touchstart'], handleClick)
 
 function animate(){
     requestAnimationFrame(animate)
