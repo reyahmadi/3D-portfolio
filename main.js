@@ -194,9 +194,6 @@ let counterRotatePC = 0, counterRotatePaper = 0;
 const backButton = document.getElementsByClassName("back-button")[0];
 const guide = document.getElementById("guide");
 
-if(isMobileDevice){
-    guide.style.opacity = 0;
-}
 
 const navbarItems = document.querySelectorAll(".nav-item");
 
