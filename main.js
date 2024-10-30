@@ -41,6 +41,7 @@ const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
 const controls = new OrbitControls(camera, renderer.domElement)
+controls.rotateSpeed = 0;
 const group = new THREE.Group();
 // const axesHelper = new THREE.AxesHelper( 5 );
 
@@ -295,7 +296,7 @@ addMultipleEventListener(window, ['click', 'touchstart'], handleClick)
 
 function animate(){
     requestAnimationFrame(animate)
-    controls.update()
+    // controls.update()
     // if the camera is not focused on the monitor, flicker the light more intensely
     let flickerIntensity = focus!=="monitor" ? 0.8 : 0.2;
     let newIntensity = Math.random() * flickerIntensity + 0.8;
